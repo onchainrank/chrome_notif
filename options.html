@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Socket.IO Connection Status</title>
+    <style>
+        /* Simple styling for the toggle */
+        #toggleContainer {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Socket.IO Status</h1>
+    <div id="toggleContainer">
+        <label>
+            <input type="checkbox" id="toggleConnect">
+            Enable WebSocket Connection
+        </label>
+    </div>
+    <div id="status">Disconnected</div>
+    <div id="notifyCount">Notify events received: 0</div>
+    <!-- Load Socket.IO client library -->
+    <script src="socket.io.min.js"></script>
+    <!-- Your custom JavaScript -->
+    <script src="options.js"></script>
+</body>
+
+</html>

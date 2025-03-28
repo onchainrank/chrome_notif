@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Socket.IO Notify Extension",
+    "version": "1.4",
+    "description": "Connects to a Socket.IO server, displays connection status, counts notify events, and opens tabs on notify events. Connection is controlled by a toggle.",
+    "options_page": "options.html",
+    "host_permissions": [
+        "https://api.onchainrank.com/*"
+    ],
+    "permissions": [
+        "tabs"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_title": "Socket.IO Extension"
+    }
+}
