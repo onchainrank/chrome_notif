@@ -2,11 +2,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusEl = document.getElementById("status");
   const notifyCountEl = document.getElementById("notifyCount");
   const toggleCheckbox = document.getElementById("toggleConnect");
+  const apiKeyInput = document.getElementById("apiKey");
+  const saveButton = document.getElementById("saveApiKey");
+  const saveMessageEl = document.getElementById("saveMessage");
+  const apiKeyStatusEl = document.getElementById("apiKeyStatus");
   let notifyCounter = 0;
   let socket = null;
 
-  // Create an audio element
+  // Create an audio element for sound notifications using notif.wav
   const audio = new Audio("notif.wav");
+
+  // Function to update the API key status display
+  const updateApiKeyStatus = (apiKey) => {
+    if (apiKey && apiKey.length > 0) {
+      apiKeyStatusEl.textContent = "Key: " + apiKey.substring(0, 4) + "...";
+    } else {
+      apiKeyStatusEl.textContent = "";
+    }
+  };
+
+  // Retrieve saved API key (if any)
+  chrome.storage.sync.get("apiKey", (data) => {
+    if (data && data.apiKey) {
+      updateApiKeyStatus(data.apiKey);
+    }
+  });
+
+  // Save API key on button click
+  saveButton.addEventListener("click", () => {
+    const apiKey = apiKeyInput.value.trim();
+    chrome.storage.sync.set({ apiKey: apiKey }, () => {
+      saveMessageEl.textContent = "API key saved!";
+      updateApiKeyStatus(apiKey);
+      // Clear the input field after saving
+      apiKeyInput.value = "";
+      setTimeout(() => {
+        saveMessageEl.textContent = "";
+      }, 3000);
+      console.log("API key saved:", apiKey);
+    });
+  });
 
   // Function to connect to the Socket.IO server
   const connectSocket = () => {
@@ -31,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       notifyCounter++;
       notifyCountEl.textContent = "Notify events received: " + notifyCounter;
 
-      // Play sound on notify event
+      // Play notification sound
       audio.play().catch((err) => console.error("Error playing sound:", err));
 
       if (message && message.url) {
@@ -45,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Toggle event listener
+  // Toggle event listener: connect/disconnect based on the toggle state
   toggleCheckbox.addEventListener("change", function () {
     if (this.checked) {
       // If toggle is on, establish the WebSocket connection.
