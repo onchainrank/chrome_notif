@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Retrieve saved API key (if any)
   chrome.storage.sync.get("apiKey", (data) => {
     if (data && data.apiKey) {
+      apiKeyInput.value = data.apiKey;
       updateApiKeyStatus(data.apiKey);
     }
   });
@@ -43,26 +44,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Function to connect to the Socket.IO server
+  // Function to connect to the onchainrank server
   const connectSocket = () => {
-    statusEl.textContent = "Connecting...";
+    statusEl.textContent = "Connecting to onchainrank server...";
+    statusEl.style.color = ""; // reset color while connecting
     socket = io("https://api.onchainrank.com");
 
     socket.on("connect", () => {
-      statusEl.textContent = "Connected";
+      statusEl.textContent = "Connected to onchainrank server";
+      statusEl.style.color = "green";
     });
 
     socket.on("disconnect", () => {
-      statusEl.textContent = "Disconnected";
+      statusEl.textContent = "Disconnected from onchainrank server";
+      statusEl.style.color = "red";
     });
 
     socket.on("connect_error", (err) => {
-      statusEl.textContent = "Connection error: " + err;
+      statusEl.textContent = "onchainrank server connection error: " + err;
+      statusEl.style.color = "red";
     });
 
-    // Listen for "notify" events from the server
+    // Listen for "notify" events from the onchainrank server
     socket.on("notify", (message) => {
-      console.log("Notify received:", message);
+      console.log("Notify event received from onchainrank server:", message);
       notifyCounter++;
       notifyCountEl.textContent = "Notify events received: " + notifyCounter;
 
@@ -83,15 +88,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Toggle event listener: connect/disconnect based on the toggle state
   toggleCheckbox.addEventListener("change", function () {
     if (this.checked) {
-      // If toggle is on, establish the WebSocket connection.
+      // If toggle is on, establish the connection to the onchainrank server.
       connectSocket();
     } else {
-      // If toggle is off, disconnect if the socket exists.
+      // If toggle is off, disconnect if the connection exists.
       if (socket) {
         socket.disconnect();
         socket = null;
       }
-      statusEl.textContent = "Disconnected";
+      statusEl.textContent = "Disconnected from onchainrank server";
+      statusEl.style.color = "black";
     }
   });
 });

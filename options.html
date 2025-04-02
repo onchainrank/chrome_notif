@@ -3,8 +3,14 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Socket.IO Connection Status</title>
+    <title>onchainrank notifier</title>
     <style>
+        #logo {
+            float: left;
+            margin: 20px;
+            max-height: 14px;
+        }
+
         #toggleContainer {
             margin-bottom: 20px;
         }
@@ -22,17 +28,26 @@
             font-weight: bold;
             color: green;
         }
+
+        #hintText {
+            margin-top: 20px;
+            font-size: 12px;
+            color: gray;
+            text-align: left;
+            margin-left: 20px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Socket.IO Status</h1>
+    <!-- Logo aligned to the right -->
+    <img id="logo" src="logo.png" alt="Logo">
 
     <!-- Toggle Section -->
     <div id="toggleContainer">
         <label>
             <input type="checkbox" id="toggleConnect">
-            Enable WebSocket Connection
+            Enable Connection
         </label>
     </div>
 
@@ -48,7 +63,12 @@
     <div id="status">Disconnected</div>
     <div id="notifyCount">Notify events received: 0</div>
 
-    <!-- Load Socket.IO client library -->
+    <!-- Hint text aligned to the right -->
+    <div id="hintText">
+        Please note: This extension only operates while this tab remains open.
+    </div>
+
+    <!-- Load onchainrank server client library (socket.io.min.js) -->
     <script src="socket.io.min.js"></script>
     <!-- Your custom JavaScript -->
     <script src="options.js"></script>
