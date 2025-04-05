@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const apiKeyStatusEl = document.getElementById("apiKeyStatus");
   let notifyCounter = 0;
   let socket = null;
+  let token = ""; // Global variable to hold the API key token
 
   // Create an audio element for sound notifications using notif.wav
   const audio = new Audio("notif.wav");
@@ -21,19 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Retrieve saved API key (if any)
+  // Retrieve saved API key (if any) and store it in the global token variable
   chrome.storage.sync.get("apiKey", (data) => {
     if (data && data.apiKey) {
+      token = data.apiKey;
       apiKeyInput.value = data.apiKey;
       updateApiKeyStatus(data.apiKey);
     }
   });
 
-  // Save API key on button click
+  // Save API key on button click, update the global token, and clear the input field
   saveButton.addEventListener("click", () => {
     const apiKey = apiKeyInput.value.trim();
     chrome.storage.sync.set({ apiKey: apiKey }, () => {
       saveMessageEl.textContent = "API key saved!";
+      token = apiKey;
       updateApiKeyStatus(apiKey);
       // Clear the input field after saving
       apiKeyInput.value = "";
@@ -44,11 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Function to connect to the onchainrank server
+  // Function to connect to the onchainrank server using the token as part of auth options
   const connectSocket = () => {
     statusEl.textContent = "Connecting to onchainrank server...";
-    statusEl.style.color = ""; // reset color while connecting
-    socket = io("https://api.onchainrank.com");
+    statusEl.style.color = ""; // Reset color while connecting
+
+    socket = io("https://api.onchainrank.com", {
+      query: { token: token },
+    });
 
     socket.on("connect", () => {
       statusEl.textContent = "Connected to onchainrank server";
@@ -58,6 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("disconnect", () => {
       statusEl.textContent = "Disconnected from onchainrank server";
       statusEl.style.color = "red";
+      // Uncheck the toggle checkbox when disconnected
+      toggleCheckbox.checked = false;
     });
 
     socket.on("connect_error", (err) => {
