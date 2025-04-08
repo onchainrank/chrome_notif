@@ -6,11 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveButton = document.getElementById("saveApiKey");
   const saveMessageEl = document.getElementById("saveMessage");
   const apiKeyStatusEl = document.getElementById("apiKeyStatus");
-  const openWebsiteCheckbox = document.getElementById("openWebsite");
-  const openXcomCheckbox = document.getElementById("openXcom");
   let notifyCounter = 0;
   let socket = null;
-  let token = ""; // holds the API key for auth
+  let token = ""; // Global variable to hold the API key token
 
   // Create an audio element for sound notifications using notif.wav
   const audio = new Audio("notif.wav");
@@ -24,24 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Retrieve saved API key and extra settings from storage
-  chrome.storage.sync.get(["apiKey", "openWebsite", "openXcom"], (data) => {
-    if (data) {
-      if (data.apiKey) {
-        token = data.apiKey;
-        apiKeyInput.value = data.apiKey;
-        updateApiKeyStatus(data.apiKey);
-      }
-      if (typeof data.openWebsite === "boolean") {
-        openWebsiteCheckbox.checked = data.openWebsite;
-      }
-      if (typeof data.openXcom === "boolean") {
-        openXcomCheckbox.checked = data.openXcom;
-      }
+  // Retrieve saved API key (if any) and store it in the global token variable
+  chrome.storage.sync.get("apiKey", (data) => {
+    if (data && data.apiKey) {
+      token = data.apiKey;
+      apiKeyInput.value = data.apiKey;
+      updateApiKeyStatus(data.apiKey);
     }
   });
 
-  // Save API key on button click and update the token
+  // Save API key on button click, update the global token, and clear the input field
   saveButton.addEventListener("click", () => {
     const apiKey = apiKeyInput.value.trim();
     chrome.storage.sync.set({ apiKey: apiKey }, () => {
@@ -57,26 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Save extra settings when checkboxes are changed
-  openWebsiteCheckbox.addEventListener("change", function () {
-    chrome.storage.sync.set({ openWebsite: this.checked }, () => {
-      console.log("Open website setting saved:", this.checked);
-    });
-  });
-
-  openXcomCheckbox.addEventListener("change", function () {
-    chrome.storage.sync.set({ openXcom: this.checked }, () => {
-      console.log("Open X.com setting saved:", this.checked);
-    });
-  });
-
-  // Function to connect to the onchainrank server using the token in auth options
+  // Function to connect to the onchainrank server using the token as part of auth options
   const connectSocket = () => {
     statusEl.textContent = "Connecting to onchainrank server...";
     statusEl.style.color = ""; // Reset color while connecting
 
     socket = io("https://api.onchainrank.com", {
-      auth: { "auth-token": token },
+      query: { token: token },
     });
 
     socket.on("connect", () => {
@@ -105,27 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // Play notification sound
       audio.play().catch((err) => console.error("Error playing sound:", err));
 
-      // Always open the main URL if provided
       if (message && message.url) {
+        // Open the URL in a new tab using chrome.tabs API
         chrome.tabs.create({ url: message.url }, (tab) => {
-          console.log("Opened URL tab:", tab);
+          console.log("New tab opened:", tab);
         });
       } else {
         console.error("Received notify event without a valid 'url' field.");
-      }
-
-      // Open "www" link if available and the corresponding option is checked
-      if (message && message.www && openWebsiteCheckbox.checked) {
-        chrome.tabs.create({ url: message.www }, (tab) => {
-          console.log("Opened website URL tab:", tab);
-        });
-      }
-
-      // Open "xcom" link if available and the corresponding option is checked
-      if (message && message.xcom && openXcomCheckbox.checked) {
-        chrome.tabs.create({ url: message.xcom }, (tab) => {
-          console.log("Opened X.com link tab:", tab);
-        });
       }
     });
   };
