@@ -1,8 +1,13 @@
 {
     "manifest_version": 3,
     "name": "onchainrank notifier",
-    "version": "1.41",
-    "description": "Connects to a Socket.IO server, displays connection status, counts notify events, opens tabs on notify events, and handles API key configuration.",
+    "version": "1.5",
+    "description": "Connects to the onchainrank server, displays connection status, counts notify events, and handles API key configuration.",
+    "icons": {
+        "16": "ocr-blue-16.png",
+        "48": "ocr-blue-48.png",
+        "128": "ocr-blue-128.png"
+    },
     "options_page": "options.html",
     "host_permissions": [
         "https://api.onchainrank.com/*"
@@ -15,11 +20,11 @@
         "service_worker": "background.js"
     },
     "action": {
-        "default_title": "Socket.IO Extension",
         "default_icon": {
-            "16": "ocr16.png",
-            "48": "ocr48.png",
-            "128": "ocr128.png"
-        }
+            "16": "ocr-blue-16.png",
+            "48": "ocr-blue-48.png",
+            "128": "ocr-blue-128.png"
+        },
+        "default_title": "onchainrank notifier"
     }
 }
