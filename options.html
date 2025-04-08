@@ -11,8 +11,10 @@
             max-height: 14px;
         }
 
+        /* Clear floats so subsequent content doesn’t wrap around the logo */
         #toggleContainer {
             margin-bottom: 20px;
+            clear: both;
         }
 
         label {
@@ -29,6 +31,15 @@
             color: green;
         }
 
+        #extraSettings {
+            margin-bottom: 20px;
+        }
+
+        #extraSettings label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
         #hintText {
             margin-top: 20px;
             font-size: 12px;
@@ -40,8 +51,8 @@
 </head>
 
 <body>
-    <!-- Logo aligned to the right -->
-    <img id="logo" src="logo.png" alt="Logo">
+    <!-- Logo aligned to the left using the 48px graphic -->
+    <img id="logo" src="ocr-blue-48.png" alt="Logo">
 
     <!-- Toggle Section -->
     <div id="toggleContainer">
@@ -60,10 +71,22 @@
         <span id="apiKeyStatus"></span>
     </div>
 
+    <!-- Extra Settings Section -->
+    <div id="extraSettings">
+        <label>
+            <input type="checkbox" id="openWebsite">
+            Open if website URL available
+        </label>
+        <label>
+            <input type="checkbox" id="openXcom">
+            Open if X.com link available
+        </label>
+    </div>
+
     <div id="status">Disconnected</div>
     <div id="notifyCount">Notify events received: 0</div>
 
-    <!-- Hint text aligned to the right -->
+    <!-- Hint text aligned to the left -->
     <div id="hintText">
         Please note: This extension only operates while this tab remains open.
     </div>
