@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.style.color = ""; // Reset color while connecting
 
     socket = io("https://api.onchainrank.com", {
-      auth: { "auth-token": token },
+      query: { token: token },
     });
 
     socket.on("connect", () => {
