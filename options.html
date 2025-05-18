@@ -8,10 +8,10 @@
         #logo {
             float: left;
             margin: 20px;
-            max-height: 18px;
+            max-height: 14px;
         }
 
-        /* Clear floats so subsequent content doesn’t wrap around the logo */
+        /* Clear floats so subsequent content does not wrap */
         #toggleContainer {
             margin-bottom: 20px;
             clear: both;
@@ -51,8 +51,8 @@
 </head>
 
 <body>
-    <!-- Logo aligned to the left using the 48px graphic -->
-    <img id="logo" src="logo.png" alt="Logo">
+    <!-- Logo -->
+    <img id="logo" src="ocr-blue-48.png" alt="Logo">
 
     <!-- Toggle Section -->
     <div id="toggleContainer">
@@ -62,7 +62,7 @@
         </label>
     </div>
 
-    <!-- API Key Input Section -->
+    <!-- API Key Section -->
     <div id="apiKeySection">
         <label for="apiKey">API Key:</label>
         <input type="text" id="apiKey" placeholder="Enter your API key">
@@ -81,19 +81,23 @@
             <input type="checkbox" id="openXcom">
             Open if X.com link available
         </label>
+        <label>
+            <input type="checkbox" id="openOnlyUnique">
+            Open only unique
+        </label>
     </div>
 
     <div id="status">Disconnected</div>
     <div id="notifyCount">Notify events received: 0</div>
 
-    <!-- Hint text aligned to the left -->
+    <!-- Hint text -->
     <div id="hintText">
         Please note: This extension only operates while this tab remains open.
     </div>
 
-    <!-- Load onchainrank server client library (socket.io.min.js) -->
+    <!-- Socket.IO client -->
     <script src="socket.io.min.js"></script>
-    <!-- Your custom JavaScript -->
+    <!-- Custom JS -->
     <script src="options.js"></script>
 </body>
 
