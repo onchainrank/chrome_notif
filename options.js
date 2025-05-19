@@ -1,4 +1,7 @@
+// options.js
+
 document.addEventListener("DOMContentLoaded", () => {
+  // DOM elements
   const statusEl = document.getElementById("status");
   const notifyCountEl = document.getElementById("notifyCount");
   const toggleCheckbox = document.getElementById("toggleConnect");
@@ -9,21 +12,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const openWebsiteCheckbox = document.getElementById("openWebsite");
   const openXcomCheckbox = document.getElementById("openXcom");
   const openOnlyUniqueCb = document.getElementById("openOnlyUnique");
+  const bullxTableBody = document.querySelector("#bullxTable tbody");
+  const openValidLaunchCb = document.getElementById("openValidLaunch");
 
+  // State
   let notifyCounter = 0;
   let socket = null;
-  let token = ""; // API key
-
+  let token = "";
+  const bullxSet = new Set();
   const audio = new Audio("notif.wav");
 
-  // Show first‐4 + ellipsis
-  const updateApiKeyStatus = (apiKey) => {
-    apiKeyStatusEl.textContent = apiKey
-      ? `Key: ${apiKey.substring(0, 4)}...`
-      : "";
-  };
+  // Helpers
+  function updateApiKeyStatus(apiKey) {
+    if (apiKey) {
+      apiKeyStatusEl.textContent = `Key: ${apiKey.substring(0, 4)}...`;
+    } else {
+      apiKeyStatusEl.textContent = "";
+    }
+  }
 
-  // Load saved settings
+  function addBullxRow(url, date) {
+    const tr = document.createElement("tr");
+    const tdUrl = document.createElement("td");
+    const link = document.createElement("a");
+    link.href = url;
+    link.textContent = url;
+    link.target = "_blank";
+    tdUrl.appendChild(link);
+
+    const tdDate = document.createElement("td");
+    tdDate.textContent = date;
+
+    tr.append(tdUrl, tdDate);
+    bullxTableBody.appendChild(tr);
+  }
+
+  // Load saved API key and settings
   chrome.storage.sync.get(
     ["apiKey", "openWebsite", "openXcom", "openOnlyUnique"],
     (data) => {
@@ -38,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
         openXcomCheckbox.checked = data.openXcom;
       if (typeof data.openOnlyUnique === "boolean")
         openOnlyUniqueCb.checked = data.openOnlyUnique;
+      if (typeof data.openValidLaunch === "boolean")
+        openValidLaunchCb.checked = data.openValidLaunch;
     }
   );
 
@@ -49,23 +75,25 @@ document.addEventListener("DOMContentLoaded", () => {
       saveMessageEl.textContent = "API key saved!";
       updateApiKeyStatus(apiKey);
       apiKeyInput.value = "";
-      setTimeout(() => (saveMessageEl.textContent = ""), 3000);
+      setTimeout(() => {
+        saveMessageEl.textContent = "";
+      }, 3000);
     });
   });
 
-  // Save toggles
-  openWebsiteCheckbox.addEventListener("change", () =>
-    chrome.storage.sync.set({ openWebsite: openWebsiteCheckbox.checked })
-  );
-  openXcomCheckbox.addEventListener("change", () =>
-    chrome.storage.sync.set({ openXcom: openXcomCheckbox.checked })
-  );
-  openOnlyUniqueCb.addEventListener("change", () =>
-    chrome.storage.sync.set({ openOnlyUnique: openOnlyUniqueCb.checked })
-  );
+  // Save extra settings
+  openWebsiteCheckbox.addEventListener("change", () => {
+    chrome.storage.sync.set({ openWebsite: openWebsiteCheckbox.checked });
+  });
+  openXcomCheckbox.addEventListener("change", () => {
+    chrome.storage.sync.set({ openXcom: openXcomCheckbox.checked });
+  });
+  openOnlyUniqueCb.addEventListener("change", () => {
+    chrome.storage.sync.set({ openOnlyUnique: openOnlyUniqueCb.checked });
+  });
 
-  // Connect logic
-  const connectSocket = () => {
+  // Connect to onchainrank server
+  function connectSocket() {
     statusEl.textContent = "Connecting to onchainrank server...";
     statusEl.style.color = "";
 
@@ -76,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("connect", () => {
       statusEl.textContent = "Connected to onchainrank server";
       statusEl.style.color = "green";
+      toggleCheckbox.checked = true;
     });
 
     socket.on("disconnect", () => {
@@ -90,7 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     socket.on("notify", (msg) => {
-      // If “open only unique” is on, skip events with valid_launch=true & unique_socials=false
+      if (openValidLaunchCb.checked && !msg.valid_launch) {
+        console.log("Skipped invalid launch event", msg);
+        return;
+      }
+      // Filter non-unique if needed
       if (
         openOnlyUniqueCb.checked &&
         msg.valid_launch === true &&
@@ -102,19 +135,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
       notifyCounter++;
       notifyCountEl.textContent = `Notify events received: ${notifyCounter}`;
-      audio.play().catch(console.error);
 
+      // Main URL
       if (msg.url) {
-        chrome.tabs.create({ url: msg.url });
+        // Record & display unique Bullx URLs
+        if (msg.url.includes("bullx") && !bullxSet.has(msg.url)) {
+          chrome.tabs.create({ url: msg.url });
+          const date = new Date().toLocaleString();
+          bullxSet.add(msg.url);
+          addBullxRow(msg.url, date);
+          audio.play().catch(console.error);
+        }
       }
+
+      // Website URL
       if (msg.www && openWebsiteCheckbox.checked) {
         chrome.tabs.create({ url: msg.www });
       }
+      // X.com URL
       if (msg.xcom && openXcomCheckbox.checked) {
         chrome.tabs.create({ url: msg.xcom });
       }
     });
-  };
+  }
 
   // Toggle connect/disconnect
   toggleCheckbox.addEventListener("change", function () {

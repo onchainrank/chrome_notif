@@ -11,7 +11,6 @@
             max-height: 14px;
         }
 
-        /* Clear floats so subsequent content does not wrap */
         #toggleContainer {
             margin-bottom: 20px;
             clear: both;
@@ -21,7 +20,8 @@
             font-size: 16px;
         }
 
-        #apiKeySection {
+        #apiKeySection,
+        #extraSettings {
             margin-bottom: 20px;
         }
 
@@ -31,13 +31,25 @@
             color: green;
         }
 
-        #extraSettings {
-            margin-bottom: 20px;
-        }
-
         #extraSettings label {
             display: block;
             margin-bottom: 5px;
+        }
+
+        #bullxSection {
+            margin-bottom: 20px;
+        }
+
+        #bullxTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #bullxTable th,
+        #bullxTable td {
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            text-align: left;
         }
 
         #hintText {
@@ -54,7 +66,7 @@
     <!-- Logo -->
     <img id="logo" src="ocr-blue-48.png" alt="Logo">
 
-    <!-- Toggle Section -->
+    <!-- Toggle -->
     <div id="toggleContainer">
         <label>
             <input type="checkbox" id="toggleConnect">
@@ -62,7 +74,7 @@
         </label>
     </div>
 
-    <!-- API Key Section -->
+    <!-- API Key -->
     <div id="apiKeySection">
         <label for="apiKey">API Key:</label>
         <input type="text" id="apiKey" placeholder="Enter your API key">
@@ -71,33 +83,37 @@
         <span id="apiKeyStatus"></span>
     </div>
 
-    <!-- Extra Settings Section -->
+    <!-- Extra Settings -->
     <div id="extraSettings">
-        <label>
-            <input type="checkbox" id="openWebsite">
-            Open if website URL available
-        </label>
-        <label>
-            <input type="checkbox" id="openXcom">
-            Open if X.com link available
-        </label>
-        <label>
-            <input type="checkbox" id="openOnlyUnique">
-            Open only unique
-        </label>
+        <label><input type="checkbox" id="openWebsite"> Open if website URL available</label>
+        <label><input type="checkbox" id="openXcom"> Open if X.com link available</label>
+        <label><input type="checkbox" id="openOnlyUnique"> Open only unique</label>
+        <label><input type="checkbox" id="openValidLaunch"> Open only valid launches</label>
     </div>
 
     <div id="status">Disconnected</div>
     <div id="notifyCount">Notify events received: 0</div>
-
-    <!-- Hint text -->
+    <!-- Hint -->
     <div id="hintText">
         Please note: This extension only operates while this tab remains open.
     </div>
+    <!-- Bullx URLs table -->
+    <div id="bullxSection">
+        <h2>Bullx URLs Received</h2>
+        <table id="bullxTable">
+            <thead>
+                <tr>
+                    <th>Bullx URL</th>
+                    <th>Date Received</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-    <!-- Socket.IO client -->
+
+
     <script src="socket.io.min.js"></script>
-    <!-- Custom JS -->
     <script src="options.js"></script>
 </body>
 
