@@ -157,16 +157,16 @@ document.addEventListener("DOMContentLoaded", () => {
             new Date().toLocaleString()
           );
           audio.play().catch(console.error);
-        }
-      }
 
-      // Website URL
-      if (msg.www && openWebsiteCheckbox.checked) {
-        chrome.tabs.create({ url: msg.www });
-      }
-      // X.com URL
-      if (msg.xcom && openXcomCheckbox.checked) {
-        chrome.tabs.create({ url: msg.xcom });
+          // Website URL
+          if (msg.www && openWebsiteCheckbox.checked) {
+            chrome.tabs.create({ url: msg.www });
+          }
+          // X.com URL
+          if (msg.xcom && openXcomCheckbox.checked) {
+            chrome.tabs.create({ url: msg.xcom });
+          }
+        }
       }
     });
   }
