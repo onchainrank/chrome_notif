@@ -31,8 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function addBullxRow(url, date) {
+  function addBullxRow(url, name, symbol, date) {
     const tr = document.createElement("tr");
+    // URL cell
     const tdUrl = document.createElement("td");
     const link = document.createElement("a");
     link.href = url;
@@ -40,11 +41,17 @@ document.addEventListener("DOMContentLoaded", () => {
     link.target = "_blank";
     tdUrl.appendChild(link);
 
+    // Name (Symbol) cell
+    const tdName = document.createElement("td");
+    tdName.textContent = `${name} (${symbol})`;
+
+    // Date cell
     const tdDate = document.createElement("td");
     tdDate.textContent = date;
 
-    tr.append(tdUrl, tdDate);
-    bullxTableBody.appendChild(tr);
+    tr.append(tdUrl, tdName, tdDate);
+    // Prepend new row
+    bullxTableBody.insertBefore(tr, bullxTableBody.firstChild);
   }
 
   // Load saved API key and settings
@@ -143,7 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
           chrome.tabs.create({ url: msg.url });
           const date = new Date().toLocaleString();
           bullxSet.add(msg.url);
-          addBullxRow(msg.url, date);
+          addBullxRow(
+            msg.url,
+            msg.name || "",
+            msg.symbol || "",
+            new Date().toLocaleString()
+          );
           audio.play().catch(console.error);
         }
       }
