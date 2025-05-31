@@ -56,11 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved API key and settings
   chrome.storage.sync.get(
-    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique"],
+    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique", "openValidLaunch"],
     (data) => {
       if (data.apiKey) {
         token = data.apiKey;
-        apiKeyInput.value = data.apiKey;
         updateApiKeyStatus(data.apiKey);
       }
       if (typeof data.openWebsite === "boolean")
@@ -98,6 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
   openOnlyUniqueCb.addEventListener("change", () => {
     chrome.storage.sync.set({ openOnlyUnique: openOnlyUniqueCb.checked });
   });
+  openValidLaunchCb.addEventListener("change", () => {
+    chrome.storage.sync.set({ openValidLaunch: openValidLaunchCb.checked });
+  });
 
   // Connect to onchainrank server
   function connectSocket() {
@@ -118,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       statusEl.textContent = "Disconnected from onchainrank server";
       statusEl.style.color = "red";
       toggleCheckbox.checked = false;
+      console.log("disconnected from server");
     });
 
     socket.on("connect_error", (err) => {
