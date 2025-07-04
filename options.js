@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const openOnlyUniqueCb = document.getElementById("openOnlyUnique");
   const bullxTableBody = document.querySelector("#bullxTable tbody");
   const openValidLaunchCb = document.getElementById("openValidLaunch");
+  const volumeSlider = document.getElementById("volumeSlider");
+  const volumeValue = document.getElementById("volumeValue");
 
   // State
   let notifyCounter = 0;
@@ -56,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved API key and settings
   chrome.storage.sync.get(
-    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique", "openValidLaunch"],
+    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique", "openValidLaunch", "notificationVolume"],
     (data) => {
       if (data.apiKey) {
         token = data.apiKey;
@@ -70,6 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
         openOnlyUniqueCb.checked = data.openOnlyUnique;
       if (typeof data.openValidLaunch === "boolean")
         openValidLaunchCb.checked = data.openValidLaunch;
+      
+      // Load volume setting
+      const volume = data.notificationVolume !== undefined ? data.notificationVolume : 50;
+      volumeSlider.value = volume;
+      volumeValue.textContent = volume;
+      audio.volume = volume / 100;
     }
   );
 
@@ -101,12 +109,20 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.storage.sync.set({ openValidLaunch: openValidLaunchCb.checked });
   });
 
+  // Volume slider event listener
+  volumeSlider.addEventListener("input", () => {
+    const volume = volumeSlider.value;
+    volumeValue.textContent = volume;
+    audio.volume = volume / 100;
+    chrome.storage.sync.set({ notificationVolume: parseInt(volume) });
+  });
+
   // Connect to onchainrank server
   function connectSocket() {
     statusEl.textContent = "Connecting to onchainrank server...";
     statusEl.style.color = "";
 
-    socket = io("https://api.onchainrank.com", {
+    socket = io("https://ws.onchainrank.com", {
       query: { token },
     });
 

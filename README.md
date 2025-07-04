@@ -75,7 +75,7 @@ This extension is designed to provide general information about interesting meme
   Replace `notif.wav` with your preferred audio file (ensure the filename is updated in the code if you change it).
 
 - **Server URL:**  
-  If required, change the server URL in `options.js` (currently set to `https://api.onchainrank.com`).
+  If required, change the server URL in `options.js` (currently set to `https://ws.onchainrank.com`).
 
 ## Troubleshooting
 

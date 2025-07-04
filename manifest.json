@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "onchainrank notifier",
-    "version": "1.65",
+    "version": "1.7",
     "description": "Connects to the onchainrank server, displays connection status, counts notify events, and handles API key configuration.",
     "icons": {
         "16": "ocr-blue-16.png",
@@ -10,7 +10,8 @@
     },
     "options_page": "options.html",
     "host_permissions": [
-        "https://api.onchainrank.com/*"
+        "https://ws.onchainrank.com/*",
+        "http://localhost:4000/*"
     ],
     "permissions": [
         "tabs",
