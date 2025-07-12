@@ -6,9 +6,14 @@
     <title>onchainrank notifier</title>
     <style>
         #logo {
-            float: left;
-            margin: 20px;
-            max-height: 14px;
+            margin: 20px 0 10px 0;
+            max-height: 18px;
+
+        }
+
+        img {
+            height: 50px;
+            width: auto;
         }
 
         #toggleContainer {
@@ -16,13 +21,57 @@
             clear: both;
         }
 
+        #toggleConnect {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #toggleConnect.connect {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #toggleConnect.disconnect {
+            background-color: #f44336;
+            color: white;
+        }
+
         label {
             font-size: 16px;
+        }
+
+        #settingsContainer {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #settingsLeft,
+        #settingsRight {
+            flex: 1;
+        }
+
+        #settingsRight {
+            margin-top: 50px
         }
 
         #apiKeySection,
         #extraSettings {
             margin-bottom: 20px;
+        }
+
+        #toggleContainer,
+        #apiKeySection,
+        #extraSettings,
+        #extraSettings label,
+        #status,
+        #notifyCount,
+        #hintText {
+            margin-top: 10px;
         }
 
         #apiKeyStatus {
@@ -63,43 +112,52 @@
 </head>
 
 <body>
-    <!-- Logo -->
-    <img id="logo" src="logo.png" alt="Logo">
+    <!-- Settings Container -->
+    <div id="settingsContainer">
+        <!-- Left Column -->
+        <div id="settingsLeft">
+            <!-- Logo -->
+            <img id="logo" src="logo.png" alt="Logo">
 
-    <!-- Toggle -->
-    <div id="toggleContainer">
-        <label>
-            <input type="checkbox" id="toggleConnect">
-            Enable Connection
-        </label>
-    </div>
+            <!-- Toggle -->
+            <div id="toggleContainer">
+                <button id="toggleConnect">Connect</button>
+            </div>
 
-    <!-- API Key -->
-    <div id="apiKeySection">
-        <label for="apiKey">API Key:</label>
-        <input type="text" id="apiKey" placeholder="Enter your API key">
-        <button id="saveApiKey">Save</button>
-        <span id="saveMessage"></span>
-        <span id="apiKeyStatus"></span>
-    </div>
+            <!-- API Key -->
+            <div id="apiKeySection">
+                <label for="apiKey">API Key:</label>
+                <input type="text" id="apiKey" placeholder="Enter your API key">
+                <button id="saveApiKey">Save</button>
+                <span id="saveMessage"></span>
+                <span id="apiKeyStatus"></span>
+            </div>
 
-    <!-- Extra Settings -->
-    <div id="extraSettings">
-        <label><input type="checkbox" id="openWebsite"> Open if website URL available</label>
-        <label><input type="checkbox" id="openXcom"> Open if X.com link available</label>
-        <label><input type="checkbox" id="openOnlyUnique"> Open only unique</label>
-        <label><input type="checkbox" id="openValidLaunch"> Open only valid launches</label>
-        
-        <!-- Volume Control -->
-        <label for="volumeSlider">Notification Volume: <span id="volumeValue">50</span>%</label>
-        <input type="range" id="volumeSlider" min="0" max="100" value="50">
-    </div>
+            <!-- Status -->
+            <div id="status">Disconnected</div>
+            <div id="notifyCount">Notify events received: 0</div>
 
-    <div id="status">Disconnected</div>
-    <div id="notifyCount">Notify events received: 0</div>
-    <!-- Hint -->
-    <div id="hintText">
-        Please note: This extension only operates while this tab remains open.
+            <!-- Hint -->
+            <div id="hintText">
+                Please note: This extension only operates while this tab remains open.
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div id="settingsRight">
+            <!-- Extra Settings -->
+            <div id="extraSettings">
+                <label><input type="checkbox" id="openWebsite"> Open if website URL available</label>
+                <label><input type="checkbox" id="openXcom"> Open if X.com link available</label>
+                <label><input type="checkbox" id="openOnlyUnique"> Open only unique</label>
+                <label><input type="checkbox" id="openValidLaunch"> Open only valid launches</label>
+                <label><input type="checkbox" id="ignoreFreshWallet"> Ignore fresh wallet launches</label>
+
+                <!-- Volume Control -->
+                <label for="volumeSlider">Notification Volume: <span id="volumeValue">50</span>%</label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="50">
+            </div>
+        </div>
     </div>
     <!-- Bullx URLs table -->
     <div id="bullxSection">

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "onchainrank notifier",
-    "version": "1.7",
+    "version": "1.8",
     "description": "Connects to the onchainrank server, displays connection status, counts notify events, and handles API key configuration.",
     "icons": {
         "16": "ocr-blue-16.png",

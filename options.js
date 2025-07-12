@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const statusEl = document.getElementById("status");
   const notifyCountEl = document.getElementById("notifyCount");
-  const toggleCheckbox = document.getElementById("toggleConnect");
+  const toggleButton = document.getElementById("toggleConnect");
   const apiKeyInput = document.getElementById("apiKey");
   const saveButton = document.getElementById("saveApiKey");
   const saveMessageEl = document.getElementById("saveMessage");
@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const openOnlyUniqueCb = document.getElementById("openOnlyUnique");
   const bullxTableBody = document.querySelector("#bullxTable tbody");
   const openValidLaunchCb = document.getElementById("openValidLaunch");
+  const ignoreFreshWalletCb = document.getElementById("ignoreFreshWallet");
   const volumeSlider = document.getElementById("volumeSlider");
   const volumeValue = document.getElementById("volumeValue");
 
@@ -23,6 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let token = "";
   const bullxSet = new Set();
   const audio = new Audio("notif.wav");
+
+  // Initialize button state
+  toggleButton.textContent = "Connect";
+  toggleButton.className = "connect";
 
   // Helpers
   function updateApiKeyStatus(apiKey) {
@@ -58,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved API key and settings
   chrome.storage.sync.get(
-    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique", "openValidLaunch", "notificationVolume"],
+    ["apiKey", "openWebsite", "openXcom", "openOnlyUnique", "openValidLaunch", "ignoreFreshWallet", "notificationVolume"],
     (data) => {
       if (data.apiKey) {
         token = data.apiKey;
@@ -72,6 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
         openOnlyUniqueCb.checked = data.openOnlyUnique;
       if (typeof data.openValidLaunch === "boolean")
         openValidLaunchCb.checked = data.openValidLaunch;
+      if (typeof data.ignoreFreshWallet === "boolean")
+        ignoreFreshWalletCb.checked = data.ignoreFreshWallet;
       
       // Load volume setting
       const volume = data.notificationVolume !== undefined ? data.notificationVolume : 50;
@@ -108,6 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
   openValidLaunchCb.addEventListener("change", () => {
     chrome.storage.sync.set({ openValidLaunch: openValidLaunchCb.checked });
   });
+  ignoreFreshWalletCb.addEventListener("change", () => {
+    chrome.storage.sync.set({ ignoreFreshWallet: ignoreFreshWalletCb.checked });
+  });
 
   // Volume slider event listener
   volumeSlider.addEventListener("input", () => {
@@ -129,13 +139,15 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("connect", () => {
       statusEl.textContent = "Connected to onchainrank server";
       statusEl.style.color = "green";
-      toggleCheckbox.checked = true;
+      toggleButton.textContent = "Disconnect";
+      toggleButton.className = "disconnect";
     });
 
     socket.on("disconnect", () => {
       statusEl.textContent = "Disconnected from onchainrank server";
       statusEl.style.color = "red";
-      toggleCheckbox.checked = false;
+      toggleButton.textContent = "Connect";
+      toggleButton.className = "connect";
       console.log("disconnected from server");
     });
 
@@ -156,6 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
         msg.unique_socials === false
       ) {
         console.log("Skipped non-unique event", msg);
+        return;
+      }
+      // Filter fresh wallet launches if needed
+      if (ignoreFreshWalletCb.checked && msg.fresh_creator_wallet === true) {
+        console.log("Skipped fresh wallet launch event", msg);
         return;
       }
 
@@ -191,14 +208,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Toggle connect/disconnect
-  toggleCheckbox.addEventListener("change", function () {
-    if (this.checked) {
+  toggleButton.addEventListener("click", function () {
+    if (this.textContent === "Connect") {
       connectSocket();
     } else if (socket) {
       socket.disconnect();
       socket = null;
       statusEl.textContent = "Disconnected from onchainrank server";
       statusEl.style.color = "black";
+      this.textContent = "Connect";
+      this.className = "connect";
     }
   });
 });
